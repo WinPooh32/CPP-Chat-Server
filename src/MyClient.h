@@ -39,10 +39,9 @@ enum chat_request {
     REQUEST_MESSAGE
 };
 
-class MyClient: public boost::enable_shared_from_this<MyClient>,
-boost::noncopyable {
+class MyClient: public boost::enable_shared_from_this<MyClient>, boost::noncopyable {
     MyClient(io_service& service) :
-        sock_(service), started_(false) {
+            sock_(service), started_(false) {
     };
     typedef MyClient self_type;
 public:
@@ -55,8 +54,7 @@ public:
     ip::tcp::socket & sock();
 
 private:
-    int parse_request(const string& request, chat_error* err, string& arg1,
-            string& arg2);
+    int parse_request(const string& request, chat_error* err, string& arg1, string& arg2);
     void on_read(const error_code & err, size_t bytes);
     void on_write(const error_code & err, size_t bytes);
     void do_read();

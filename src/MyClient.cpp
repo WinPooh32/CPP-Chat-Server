@@ -57,8 +57,7 @@ int get_next_word(const string& source, int begin, string& arg) {
     }
 }
 
-int MyClient::parse_request(const string& request, chat_error* err,
-        string& arg1, string& arg2) {
+int MyClient::parse_request(const string& request, chat_error* err, string& arg1, string& arg2) {
 #define AUTH_LEN 5
 #define REG_LEN 10
 #define DIS_R_LEN 17
@@ -116,21 +115,20 @@ void MyClient::on_read(const error_code & err, size_t bytes) {
         cout << "RAW_MSG: " << msg << endl;
         if ((result = parse_request(msg, &err, arg1, arg2)) != -1) {
             /*
-			 REQUEST_AUTH = 0,
-			 REQUEST_REGISTER,
-			 REQUEST_DISCONNECT_ROOM,
-			 REQUEST_DISCONNECT,
-			 REQUEST_PING,
-			 REQUEST_JOIN,
-			 REQUEST_MESSAGE
+             REQUEST_AUTH = 0,
+             REQUEST_REGISTER,
+             REQUEST_DISCONNECT_ROOM,
+             REQUEST_DISCONNECT,
+             REQUEST_PING,
+             REQUEST_JOIN,
+             REQUEST_MESSAGE
              */
 
             switch (result) {
 
             case REQUEST_MESSAGE:
                 STOPIFNAUTH
-                do_write_broadcast(
-                        string("MESSAGE:\"") + "<" + nick_ + ">" + arg1 + "\"");
+                do_write_broadcast(string("MESSAGE:\"") + "<" + nick_ + ">" + arg1 + "\"");
 
                 cout << arg1 << endl;
                 break;
@@ -176,8 +174,7 @@ void MyClient::on_write(const error_code & err, size_t bytes) {
 
 void MyClient::do_read() {
 
-    sock_.async_read_some(buffer(read_buffer_),
-            boost::bind(&MyClient::on_read, shared_from_this(), _1, _2));
+    sock_.async_read_some(buffer(read_buffer_), boost::bind(&MyClient::on_read, shared_from_this(), _1, _2));
     //async_read(sock_, buffer(read_buffer_), MEM_FN2(read_complete,_1,_2), MEM_FN2(on_read,_1,_2));
     //async_read(sock_, buffer(read_buffer_), transfer_all(), MEM_FN2(on_read,_1,_2));
 }
@@ -185,8 +182,7 @@ void MyClient::do_read() {
 void MyClient::do_write(const std::string & msg) {
     if (sock_.is_open()) {
         std::copy(msg.begin(), msg.end(), write_buffer_);
-        sock_.async_write_some(buffer(write_buffer_, msg.size()),
-                MEM_FN2(on_write, _1, _2));
+        sock_.async_write_some(buffer(write_buffer_, msg.size()), MEM_FN2(on_write, _1, _2));
     } else {
         stop();
     }
@@ -195,8 +191,7 @@ void MyClient::do_write(const std::string & msg) {
 void MyClient::do_write_error(const std::string & msg) {
     if (sock_.is_open()) {
         std::copy(msg.begin(), msg.end(), write_buffer_);
-        sock_.async_write_some(buffer(write_buffer_, msg.size()),
-                MEM_FN2(on_write, _1, _2));
+        sock_.async_write_some(buffer(write_buffer_, msg.size()), MEM_FN2(on_write, _1, _2));
     }
     stop();
 }
@@ -205,16 +200,14 @@ void MyClient::do_write_broadcast(const std::string & msg) {
     std::copy(msg.begin(), msg.end(), write_buffer_);
     for (auto it = clients_.begin(); it != clients_.end(); it++) {
         if (it->get()->sock_.is_open()) {
-            it->get()->sock_.async_write_some(buffer(write_buffer_, msg.size()),
-                    MEM_FN2(on_write, _1, _2));
+            it->get()->sock_.async_write_some(buffer(write_buffer_, msg.size()), MEM_FN2(on_write, _1, _2));
         } else {
             it->get()->stop();
         }
     }
 }
 
-size_t MyClient::read_complete(const boost::system::error_code & err,
-        size_t bytes) {
+size_t MyClient::read_complete(const boost::system::error_code & err, size_t bytes) {
     if (err)
         return 0;
     //bool found = std::find(read_buffer_, read_buffer_ + bytes, '\0') < read_buffer_ + bytes;
