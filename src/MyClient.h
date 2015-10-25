@@ -19,7 +19,7 @@ using boost::asio::ip::tcp;
 #define MEM_FN1(x,y)    boost::bind(&self_type::x, shared_from_this(),y)
 #define MEM_FN2(x,y,z)  boost::bind(&self_type::x, shared_from_this(),y,z)
 
-enum chat_error{
+enum chat_error {
 	ERORR_AUTH_FAIL = 0,
 	ERROR_TAKEN_NICKNAME,
 	ERROR_BAD_PASSWORD,
@@ -29,7 +29,7 @@ enum chat_error{
 	ERROR_BAD_REQUEST
 };
 
-enum chat_request{
+enum chat_request {
 	REQUEST_AUTH = 0,
 	REQUEST_REGISTER,
 	REQUEST_DISCONNECT_ROOM,
@@ -39,31 +39,37 @@ enum chat_request{
 	REQUEST_MESSAGE
 };
 
-class MyClient  : public boost::enable_shared_from_this<MyClient>, boost::noncopyable {
-	MyClient(io_service& service): sock_(service), started_(false){};
+class MyClient: public boost::enable_shared_from_this<MyClient>,
+		boost::noncopyable {
+	MyClient(io_service& service) :
+			sock_(service), started_(false) {
+	};
 	typedef MyClient self_type;
 public:
-    typedef boost::system::error_code error_code;
-    typedef boost::shared_ptr<MyClient> ptr;
+	typedef boost::system::error_code error_code;
+	typedef boost::shared_ptr<MyClient> ptr;
 
-    void start();
-    static ptr new_(io_service& service);
-    void stop();
-    ip::tcp::socket & sock();
+	void start();
+	static ptr new_(io_service& service);
+	void stop();
+	ip::tcp::socket & sock();
 
 private:
-    int parse_request(const string& request, chat_error* err, string& arg1, string& arg2);
-    void on_read(const error_code & err, size_t bytes);
-    void on_write(const error_code & err, size_t bytes);
-    void do_read();
-    void do_write(const std::string & msg);
-    void do_write_error(const std::string & msg);
-    void do_write_broadcast(const std::string & msg);
-    size_t read_complete(const boost::system::error_code & err, size_t bytes);
+	int parse_request(const string& request, chat_error* err, string& arg1,
+			string& arg2);
+	void on_read(const error_code & err, size_t bytes);
+	void on_write(const error_code & err, size_t bytes);
+	void do_read();
+	void do_write(const std::string & msg);
+	void do_write_error(const std::string & msg);
+	void do_write_broadcast(const std::string & msg);
+	size_t read_complete(const boost::system::error_code & err, size_t bytes);
 
-    enum { max_msg = 1024 };
-    char read_buffer_[max_msg];
-    char write_buffer_[max_msg];
+	enum {
+		max_msg = 1024
+	};
+	char read_buffer_[max_msg];
+	char write_buffer_[max_msg];
 	ip::tcp::socket sock_;
 	bool started_;
 	bool auth_done_ = false;
